@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>33 Años Juntos — Nuestra Historia</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            serif: ['"Playfair Display"', 'serif'],
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#fbf8f3',
+              100: '#f5efe4',
+              200: '#ecdcc8',
+              800: '#543d2b',
+              900: '#2c1810',
+              gold: '#c59b27'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Estilos para el giro 3D de las tarjetas */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+  </style>
+</head>
+<body class="bg-brand-50 text-slate-800 font-sans antialiased selection:bg-brand-gold selection:text-white">
+
+  <!-- ==================== PANTALLA DE ACCESO (PIN FAMILIAR) ==================== -->
+  <div id="lockScreen" class="fixed inset-0 z-50 flex items-center justify-center bg-stone-950 px-4 transition-opacity duration-700">
+    <div class="max-w-md w-full text-center space-y-6 bg-stone-900 border border-stone-800 p-8 rounded-3xl shadow-2xl">
+      <div class="w-16 h-16 mx-auto bg-amber-500/10 border border-amber-500/30 rounded-2xl flex items-center justify-center text-2xl">
+        🗝️
+      </div>
+      <div>
+        <h1 class="font-serif text-3xl text-amber-100 font-semibold tracking-wide">Espacio Reservado</h1>
+        <p class="text-sm text-stone-400 mt-2">Solo para los cumpleañeros de este 06 de octubre. Ingresa el código secreto familiar:</p>
+      </div>
+
+      <form id="pinForm" class="space-y-4">
+        <div>
+          <input 
+            type="password" 
+            id="pinInput" 
+            maxlength="8" 
+            placeholder="Introduce el código" 
+            class="w-full text-center text-xl tracking-widest py-3 px-4 rounded-xl bg-stone-950 border border-stone-700 text-amber-200 placeholder:text-stone-600 focus:outline-none focus:border-amber-400 transition"
+            required
+            autocomplete="off"
+          />
+        </div>
+        <p id="errorMsg" class="text-xs text-rose-400 hidden">Código incorrecto. Recuerda que es el año de nacimiento (o 1993 / 0610).</p>
+        
+        <button 
+          type="submit" 
+          class="w-full py-3.5 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-stone-950 font-semibold rounded-xl transition duration-300 shadow-lg shadow-amber-600/20 active:scale-95"
+        >
+          Entrar a los Recuerdos
+        </button>
+      </form>
+      <p class="text-xs text-stone-500">Pista sugerida: El año en que nacieron (ej. 1993)</p>
+    </div>
+  </div>
+
+  <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
+  <div id="mainContent" class="hidden min-h-screen flex flex-col justify-between">
+    
+    <!-- Audio de Fondo (Cajita Musical) -->
+    <audio id="bgMusic" loop preload="auto">
+      <source src="BARNEY.WAV" type="audio/wav">
+      <source src="BARNEY.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Botón flotante para pausar/reanudar música -->
+    <button 
+      id="musicToggleBtn" 
+      onclick="toggleMusic()" 
+      class="fixed bottom-6 right-6 z-40 bg-stone-900/80 hover:bg-stone-900 text-amber-200 p-3 rounded-full shadow-lg border border-amber-500/30 backdrop-blur-md transition active:scale-95 flex items-center justify-center"
+      title="Controlar música"
+    >
+      <span id="musicIcon" class="text-lg">🎵</span>
+    </button>
+
+    <!-- Hero / Encabezado -->
+    <header class="relative pt-20 pb-16 px-6 max-w-5xl mx-auto text-center">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-100 border border-amber-200 text-amber-900 text-xs font-semibold uppercase tracking-wider mb-6">
+        🎉 06 de Octubre · 33 Años
+      </div>
+      <h1 class="font-serif text-4xl sm:text-6xl text-brand-900 font-bold tracking-tight leading-tight">
+        Tres Vidas, Una Misma Raíz
+      </h1>
+      <p class="mt-4 max-w-2xl mx-auto text-base sm:text-lg text-stone-600 font-light leading-relaxed">
+        El museo de nuestras anécdotas, risas y secretos familiares. Haz clic o toca cada fotografía para descubrir lo que mamá recuerda de ese instante.
+      </p>
+
+      <!-- Botón de Confetti y Música -->
+      <div class="mt-8 flex justify-center gap-4">
+        <button 
+          onclick="celebrar()" 
+          class="px-6 py-2.5 rounded-full bg-brand-900 text-amber-200 font-medium text-sm hover:bg-stone-800 transition duration-300 shadow-md inline-flex items-center gap-2 active:scale-95 cursor-pointer"
+        >
+          ✨ ¡Lanzar Recuerdos!
+        </button>
+      </div>
+    </header>
+
+    <!-- Sección Interactiva: Historias Detrás de la Foto -->
+    <main class="max-w-6xl mx-auto px-6 pb-24 w-full">
+      <div class="flex items-center justify-between border-b border-stone-200 pb-4 mb-10">
+        <div>
+          <h2 class="font-serif text-2xl sm:text-3xl text-brand-900 font-semibold">Historias Detrás de la Foto</h2>
+          <p class="text-xs sm:text-sm text-stone-500 mt-1">Gira las tarjetas tocando sobre ellas</p>
+        </div>
+        <span class="text-xs bg-stone-200/80 text-stone-700 px-3 py-1 rounded-full font-medium">33 Aniversario</span>
+      </div>
+
+      <!-- Grid de Flip Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+        <!-- TARJETA 1 -->
+        <div class="flip-card h-[430px] perspective-1000 cursor-pointer" onclick="toggleFlip(this)">
+          <div class="flip-card-inner relative w-full h-full duration-700 transform-style-3d transition-transform rounded-3xl shadow-lg border border-stone-200">
+            <!-- Cara Delantera (Foto) -->
+            <div class="absolute inset-0 backface-hidden bg-white rounded-3xl p-4 flex flex-col justify-between">
+              <div class="w-full h-72 rounded-2xl overflow-hidden bg-stone-100 relative group">
+                <img 
+                  src="https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=800&auto=format&fit=crop" 
+                  alt="La llegada" 
+                  class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                />
+                <span class="absolute top-3 right-3 bg-stone-900/70 backdrop-blur-md text-amber-200 text-xs px-2.5 py-1 rounded-full font-medium">
+                  Hito 01
+                </span>
+              </div>
+              <div class="pt-3 pb-1">
+                <h3 class="font-serif text-lg font-bold text-stone-900">La Llegada al Mundo</h3>
+                <div class="flex justify-between items-center mt-1 text-xs text-stone-500">
+                  <span>Octubre de 1993</span>
+                  <span class="text-amber-700 font-medium inline-flex items-center gap-1">Toca para leer 🔄</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cara Trasera (Anécdota de Mamá) -->
+            <div class="absolute inset-0 backface-hidden rotate-y-180 bg-brand-900 text-white rounded-3xl p-6 flex flex-col justify-between border border-amber-900/40">
+              <div>
+                <span class="text-amber-400 text-xs font-semibold uppercase tracking-widest">Lo que no se ve en la foto</span>
+                <h3 class="font-serif text-xl font-bold text-amber-100 mt-1">Aquel Día en la Clínica</h3>
+                <p class="text-stone-300 text-sm mt-4 leading-relaxed font-light">
+                  "Todo el equipo médico estaba conmocionado preparando las tres cunitas al unísono. Segundos antes de esta foto, los tres lloraron al mismo tiempo como un coro perfectamente sincronizado. Supe en ese instante exacto que mi vida se multiplicaba por tres de la forma más hermosa."
+                </p>
+              </div>
+              <div class="pt-4 border-t border-stone-700/60 flex items-center justify-between text-xs text-amber-300/80">
+                <span>— Recuerdos de mamá</span>
+                <span class="text-stone-400">Girar de nuevo ↩</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TARJETA 2 -->
+        <div class="flip-card h-[430px] perspective-1000 cursor-pointer" onclick="toggleFlip(this)">
+          <div class="flip-card-inner relative w-full h-full duration-700 transform-style-3d transition-transform rounded-3xl shadow-lg border border-stone-200">
+            <!-- Cara Delantera -->
+            <div class="absolute inset-0 backface-hidden bg-white rounded-3xl p-4 flex flex-col justify-between">
+              <div class="w-full h-72 rounded-2xl overflow-hidden bg-stone-100 relative group">
+                <img 
+                  src="https://images.unsplash.com/photo-1543807535-eceef0bc6599?q=80&w=800&auto=format&fit=crop" 
+                  alt="Primeros pasos" 
+                  class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                />
+                <span class="absolute top-3 right-3 bg-stone-900/70 backdrop-blur-md text-amber-200 text-xs px-2.5 py-1 rounded-full font-medium">
+                  Hito 02
+                </span>
+              </div>
+              <div class="pt-3 pb-1">
+                <h3 class="font-serif text-lg font-bold text-stone-900">La Gran Travesura en la Sala</h3>
+                <div class="flex justify-between items-center mt-1 text-xs text-stone-500">
+                  <span>A los 3 años</span>
+                  <span class="text-amber-700 font-medium inline-flex items-center gap-1">Toca para leer 🔄</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cara Trasera -->
+            <div class="absolute inset-0 backface-hidden rotate-y-180 bg-brand-900 text-white rounded-3xl p-6 flex flex-col justify-between border border-amber-900/40">
+              <div>
+                <span class="text-amber-400 text-xs font-semibold uppercase tracking-widest">Lo que pasaba justo antes</span>
+                <h3 class="font-serif text-xl font-bold text-amber-100 mt-1">El Complot Infantil</h3>
+                <p class="text-stone-300 text-sm mt-4 leading-relaxed font-light">
+                  "Estaban sospechosamente callados. Cuando entré a la sala, uno hacía de guardia en la puerta, el segundo sostenía el taburete y el tercero alcanzaba la lata de galletas. Al verme se congelaron y sonrieron como ángeles fingiendo inocencia."
+                </p>
+              </div>
+              <div class="pt-4 border-t border-stone-700/60 flex items-center justify-between text-xs text-amber-300/80">
+                <span>— Recuerdos de mamá</span>
+                <span class="text-stone-400">Girar de nuevo ↩</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TARJETA 3 -->
+        <div class="flip-card h-[430px] perspective-1000 cursor-pointer" onclick="toggleFlip(this)">
+          <div class="flip-card-inner relative w-full h-full duration-700 transform-style-3d transition-transform rounded-3xl shadow-lg border border-stone-200">
+            <!-- Cara Delantera -->
+            <div class="absolute inset-0 backface-hidden bg-white rounded-3xl p-4 flex flex-col justify-between">
+              <div class="w-full h-72 rounded-2xl overflow-hidden bg-stone-100 relative group">
+                <img 
+                  src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=800&auto=format&fit=crop" 
+                  alt="Orgullo y títulos" 
+                  class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                />
+                <span class="absolute top-3 right-3 bg-stone-900/70 backdrop-blur-md text-amber-200 text-xs px-2.5 py-1 rounded-full font-medium">
+                  Hito 03
+                </span>
+              </div>
+              <div class="pt-3 pb-1">
+                <h3 class="font-serif text-lg font-bold text-stone-900">Nuevos Caminos y Metas</h3>
+                <div class="flex justify-between items-center mt-1 text-xs text-stone-500">
+                  <span>Graduaciones y Éxitos</span>
+                  <span class="text-amber-700 font-medium inline-flex items-center gap-1">Toca para leer 🔄</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Cara Trasera -->
+            <div class="absolute inset-0 backface-hidden rotate-y-180 bg-brand-900 text-white rounded-3xl p-6 flex flex-col justify-between border border-amber-900/40">
+              <div>
+                <span class="text-amber-400 text-xs font-semibold uppercase tracking-widest">El orgullo más grande</span>
+                <h3 class="font-serif text-xl font-bold text-amber-100 mt-1">Creciendo con Carácter</h3>
+                <p class="text-stone-300 text-sm mt-4 leading-relaxed font-light">
+                  "Ver a cada uno encontrar su pasión —en la tecnología, el mercadeo y la vida— me demostró que aunque nacieron juntos en el mismo segundo, cada uno tiene su propia luz única e imparable. Llegar a sus 33 viéndolos realizados es mi mayor orgullo."
+                </p>
+              </div>
+              <div class="pt-4 border-t border-stone-700/60 flex items-center justify-between text-xs text-amber-300/80">
+                <span>— Recuerdos de mamá</span>
+                <span class="text-stone-400">Girar de nuevo ↩</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Sección de Mensaje de Mamá -->
+      <div class="mt-16 bg-white border border-stone-200 rounded-3xl p-8 sm:p-10 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="space-y-2 text-center md:text-left">
+          <span class="text-xs uppercase font-bold tracking-widest text-amber-700">Dedicatoria Especial</span>
+          <h3 class="font-serif text-2xl font-bold text-brand-900">La Carta de Mamá para sus 33</h3>
+          <p class="text-stone-600 text-sm max-w-xl">
+            "33 años siendo testigo de cómo un amor multiplicado por tres creció hasta convertirse en tres personas maravillosas. ¡Feliz cumpleaños, mis tesoros!"
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-6 text-xs text-stone-500 border-t border-stone-200 bg-stone-100/50">
+      Hecho con todo el amor de mamá para sus trillizos favoritos · 06 de Octubre
+    </footer>
+
+  </div>
+
+  <!-- ==================== LÓGICA JAVASCRIPT ==================== -->
+  <script>
+    // Configuración del PIN secreto
+    const SECRET_PIN = "1993"; // o "0610"
+
+    const pinForm = document.getElementById('pinForm');
+    const pinInput = document.getElementById('pinInput');
+    const errorMsg = document.getElementById('errorMsg');
+    const lockScreen = document.getElementById('lockScreen');
+    const mainContent = document.getElementById('mainContent');
+    const bgMusic = document.getElementById('bgMusic');
+    const musicIcon = document.getElementById('musicIcon');
+
+    // Desbloqueo de pantalla (Sin reproducir audio aquí)
+    pinForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const enteredPin = pinInput.value.trim();
+
+      if (enteredPin === SECRET_PIN || enteredPin === "1993" || enteredPin === "0610") {
+        lockScreen.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+          lockScreen.classList.add('hidden');
+          mainContent.classList.remove('hidden');
+        }, 700);
+      } else {
+        errorMsg.classList.remove('hidden');
+        pinInput.classList.add('border-rose-500');
+        setTimeout(() => pinInput.classList.remove('border-rose-500'), 500);
+      }
+    });
+
+    // Función para voltear las tarjetas (Flip Cards)
+    function toggleFlip(cardElement) {
+      const inner = cardElement.querySelector('.flip-card-inner');
+      inner.classList.toggle('rotate-y-180');
+    }
+
+    // Al hacer click en "¡Lanzar Recuerdos!": Confeti + Canción de fondo
+    function celebrar() {
+      // 1. Confeti
+      if (typeof confetti === 'function') {
+        confetti({
+          particleCount: 130,
+          spread: 85,
+          origin: { y: 0.6 }
+        });
+      }
+
+      // 2. Iniciar música de fondo
+      if (bgMusic && bgMusic.paused) {
+        bgMusic.volume = 0.45; // Volumen moderado de fondo
+        bgMusic.play().then(() => {
+          if (musicIcon) musicIcon.textContent = '🎵';
+        }).catch(err => {
+          console.warn("Reproducción bloqueada o archivo no encontrado:", err);
+        });
+      }
+    }
+
+    // Botón flotante para pausar / reanudar la música
+    function toggleMusic() {
+      if (!bgMusic) return;
+
+      if (bgMusic.paused) {
+        bgMusic.play();
+        musicIcon.textContent = '🎵';
+      } else {
+        bgMusic.pause();
+        musicIcon.textContent = '🔇';
+      }
+    }
+  </script>
+</body>
+</html>
